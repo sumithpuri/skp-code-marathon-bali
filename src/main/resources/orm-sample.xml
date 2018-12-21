@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:ehcache="http://www.springmodules.org/schema/ehcache"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+            http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+            http://www.springmodules.org/schema/ehcache 
+            http://www.springmodules.org/schema/cache/springmodules-ehcache.xsd">
+              
+<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+	<property name="dataSource" ref="dataSource"/>
+		<property name="mappingResources">
+			<list>
+				<value>Doctor.hbm.xml</value>
+			</list>
+		</property>
+	<property name="hibernateProperties">
+		<props>
+			<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+		</props>
+	</property>
+</bean>
+
+<bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+	<property name="sessionFactory" ref="sessionFactory"/>
+</bean>
+
+<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+	<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+	<property name="url" value="jdbc:mysql://localhost:3306/data_explosion"/>
+	<property name="username" value="root"/>
+	<property name="password" value="Collabera@2018"/>
+</bean>
+
+<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<property name="location" value="hibernate.properties"/>
+</bean>
+
+<bean id="doctorDao" class="me.sumithpuri.github.bali.spring.orm.sample.HibernateDoctorDao">
+	<property name="hibernateTemplate" ref="hibernateTemplate" />
+</bean>
+
+<ehcache:config configLocation="classpath:eh-cache.xml" />
+
+<ehcache:annotations>
+	<ehcache:caching id="doctorCacheModel" cacheName="doctorCache" />
+	<ehcache:flushing id="doctorFlushModel" cacheNames="doctorCache" when="before" />
+</ehcache:annotations>
+
+</beans>
